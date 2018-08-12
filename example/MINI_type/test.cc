@@ -6,6 +6,8 @@
 #include <zxc_net/EventLoop.h>
 #include <zxc_net/Logger.h>
 
+#include <Tool.h>
+
 #include <iostream>
 #include <map>
 #include <string>
@@ -13,32 +15,60 @@ using namespace std;
 
 
 
-void onRequest(const HttpRequest& req, HttpResponse* resp)
-{
-	DEBUG(" do work IN user's onRequest()\n");
-	INFO("HttpResponse's path is %s\n",req.path().c_str() );
+void onRequest(const HttpRequest& req, HttpResponse* resp)   
+{                                   
+	bool is_false=true;
+	Tool tool;
+	DEBUG(" do work IN user's onRequest()\n");                
+	INFO("HttpResponse's path is %s\n",req.path().c_str() );      
 
-    string path=Util::ConstructPath(req.path());
-    string extent=Util::GetExtent(path);
+	std::string path = req.path();
+	auto it = std::find(path.begin()+1,path.end(),'/');  //FIXME
 
-	INFO("path's %s ---extent is %s\n",  path.c_str(),extent.c_str());
+	std::string is_client_or_backup(path.begin()+1,it-1);
+	int method_number = stoi( string(it+1,path.end()).c_str() );
 
-    string contentType="";
-    Util::GetContentType(extent,contentType);
-    string content=Util::GetContent(path);
-    if(content.empty())
+	DEBUG(" is_client_or_backup:%s---method_number:%d\n", is_client_or_backup.c_str(), method_number );
+	
+	if (is_client_or_backup == "client") {
+		std::string temp;
+		switch (method_number) {
+		case 1:  is_false = tool.client_1_handle_xhttp(req.getBody(), &temp);	 resp->setBody(temp);  break;
+		case 2:  is_false = tool.client_2_handle_xhttp(req.getBody(), (req.getHeader("Content-Type") != string(NULL)  )? req.getHeader("Content-Type"):req.getHeader("content-type")); break;
+		
+		case 3:  is_false = tool.client_3_handle_xhttp(req.getBody(), &temp);	 resp->setBody(temp);  break;
+
+		case 4:  is_false = tool.client_4_handle_xhttp(req.getBody(), &temp);	 resp->setBody(temp);  break;
+		default: {		
+			ERROR("Request error \n");
+			is_false = false; }
+		}
+	} else if (is_client_or_backup == "backup") {
+            // FIXME   
+	}
+	else {
+		ERROR("Request error \n");	
+		is_false = false;
+	}
+	 
+
+    if(is_false == false)
     {
-        resp->setStatusCode(HttpResponse::CODE_404);
-        resp->setStatusMessage("Not Found");
+        resp->setStatusCode(HttpResponse::CODE_400);
+        resp->setStatusMessage("Bad Request");
     }
     else
-    {
-        resp->setBody(content);
+    {   
         resp->setStatusCode(HttpResponse::CODE_200);
         resp->setStatusMessage("OK");
-        resp->setContentType(contentType);
+        resp->setContentType("text/plain");
     } 
 }
+
+
+
+
+
 
 int main(int argc, char* argv[])
 {
@@ -49,6 +79,7 @@ int main(int argc, char* argv[])
 	    //benchmark = true;
         numThreads = atoi(argv[1]);
     }
+
 	zxc_net::EventLoop loop;
     HttpServer server(&loop, zxc_net::InetAddress(8000) );
     server.setHttpCallback(onRequest);
