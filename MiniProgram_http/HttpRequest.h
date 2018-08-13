@@ -55,12 +55,15 @@ class HttpRequest:zxc_net::copyable
 
 			void swap(HttpRequest& that);
 
-     private:
-			Method method_;
-			Version version_;
-			string path_;
-			string query_;
-		//	zxc_net::Timestamp receiveTime_;
-			std::map<string,string>headers_;
+			void setBody(const char*start, const char*end);
+			string getBody()const;
+
+     private:					
+			// zxc_net::Timestamp receiveTime_;
+			
+			Method method_; /*spaceBlock*/  string path_; string query_;   /*spaceBlock*/   Version version_;
+			std::map<string, string>headers_;
+			string body_;
+
 };
 #endif 

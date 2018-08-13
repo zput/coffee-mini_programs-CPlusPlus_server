@@ -126,7 +126,7 @@ void HttpRequest::addHeader(const char* start,
 
 string HttpRequest::getHeader(const string& field) const
 {
-    string result;
+    string result = "";   // is error string result = NULL 
     std::map<string, string>::const_iterator it = headers_.find(field);
     if (it != headers_.end())
     {
@@ -147,4 +147,21 @@ void HttpRequest::swap(HttpRequest& that)
     query_.swap(that.query_);
   //  receiveTime_.swap(that.receiveTime_);
     headers_.swap(that.headers_);
+
+	body_.swap(that.body_);
 }
+
+
+void HttpRequest::setBody(const char*start, const char*end)
+{
+	body_.assign(start, end);
+}
+string HttpRequest::getBody() const
+{
+	return body_;
+}
+
+
+
+
+

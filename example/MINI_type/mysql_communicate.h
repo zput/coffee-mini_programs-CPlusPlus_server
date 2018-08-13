@@ -1,41 +1,58 @@
+
 #pragma once
 
+#if defined(_WIN32)
+#include <windows.h>
+#include "winsock.h" 
+#include "include\mysql.h"
+#pragma comment(lib,"libmySQL.lib") 
+#pragma warning(disable:4996)
+#else
 
-#include <mysql\mysql.h>
+#include <mysql/mysql.h>
+
+#endif
+
+
 #include<zxc_net/Logger.h>
-
+#include <iostream>
+#include <stdio.h>
+#include <string>
+#include <time.h>
+#include <string.h>
 
 class mysql {
 
 public:
 	bool	IniteMysqlAndConnected();
-	bool    mysql::SaveJsonData2Mysql(std::string * strJsonData, std::string id);
-//	bool    mysql::GetIdDataFromMysql(std::string * openid_data);
-	bool    mysql::GetIdOrDataFromMysql(std::string column_name,std::string * openid_data);
+	bool    SaveJsonData2Mysql(std::string * strJsonData, std::string id);
+//	bool    GetIdDataFromMysql(std::string * openid_data);
+	bool    GetIdOrDataFromMysql(std::string column_name,std::string * openid_data);
 
 	//overload function GetIdOrDataFromMysql()
-	bool    mysql::GetIdOrDataFromMysql(std::string column_name, std::string * openid_data, bool whetherReleaseCon);
+	bool    GetIdOrDataFromMysql(std::string column_name, std::string * openid_data, bool whetherReleaseCon);
 
 
 	//void    PrintTable2Screen(void);
 
 	///////////此处我没有关闭MySQL的con///////////////////////////////////
-	bool  mysql::GetIdFromMysql(std::string*  id, bool whetherReleaseCon);
+	bool    GetIdFromMysql(std::string*  id, bool whetherReleaseCon);
 
 
 	/////////////////////////commonGetDataFromMysql///////////////////////
-	bool  mysql::commonGetDataFromMysql(std::string inputString, std::string * theRowHadRead);
-	bool  mysql::commonOrderMysql(std::string inputString);
+	bool  commonGetDataFromMysql(std::string inputString, std::string * theRowHadRead);
+	bool  commonOrderMysql(std::string inputString);
 
-	bool  mysql::deleteFinishEqual1DataFromMysql(std::string inputString, std::string * theRowHadRead);
+	bool  deleteFinishEqual1DataFromMysql(std::string inputString, std::string * theRowHadRead);
 
 
-		void mysql::closeMysqlCon();
+		void closeMysqlCon();
 
-		std::string return_tablename_mysql() {
+		std::string   return_tablename_mysql() {
 			std::string temp = tablename;
 			return temp;
 		}
+
 private:
 		char dbuser[30] = "debian-sys-maint";
 		char dbpasswd[30] = "RY7G5mfX3Nt2U4Bt";

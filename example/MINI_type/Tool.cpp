@@ -2,7 +2,7 @@
 #include "Tool.h"
 
 
- const string picture_path_in_server_weixin = "C:/WEIXIN/picture_9020/";
+	const  string Tool::picture_path_in_server_weixin = "/home/zxc/test_Miniprogram_http";
 
  
  bool	writerDataToFile(std::string filepath, std::string data_need_to_writted, int length)
@@ -57,33 +57,14 @@
 	bool creat_html_aboutId(std::string * strJsonData, std::string id)
 	{
 		char * html_code = new char[2000]();
-		
-
-		       //char buf_temp[51200 * 2] = "\0";
-				//for (int i = 0; i <= end_begin_value; i++) {
-				//printf("msg:%s", msg.c_str());
-				//socketConnect_1.socketSend(msg.c_str(), msg.length());
 		std::string filepath ="C:/WEIXIN/WEIXIN/nginx-1.13.1/html/237/template.html"; // nginx 的页面路径！！！
-				//filepath1 + to_string(begin_number_int + i) + ".jpg";
-	//    printf("\nfilepath:%s\n", filepath.c_str());
-
-		       //buf_temp[picture_size[i] + 1] = '\0';
 	    ifstream fin(filepath, ios::in | ios::binary | ios::ate);
-			   //size = data_need_to_writted.length();
-			   //////in.seekg(0, ios::beg);
-			   //buffer = new char[size];
-			   ///in.read(buffer, size);
 		fin.seekg(0, std::ios::end);
 		std::streampos html_size=fin.tellg();
-
-		fin.seekg(0, ios::beg);                        ///////////////////
+		fin.seekg(0, ios::beg);                      
 		fin.read(html_code, html_size);
 		fin.close();
-	          //printf("\n%s\n", html_code);
-   /////////////////read  data over///////////////////////////////////	        
 
-   /////////////////modify the data Notice//////////////////////
-		//openid, driving_type, user_name, user_phone, user_address, user_company, user_zw
 
 		const int byte_number[7] = {427,545,668,830,967,1236,1503};
 
@@ -108,20 +89,13 @@
 		}
 	
 
-   ///////////////// write to a new html file////////////////////////////////////////
-		                //long size;
+             // write to a new html file
+		  
 		filepath = "C:/WEIXIN/WEIXIN/nginx-1.13.1/html/9020/"+id+".html";
 		ofstream out(filepath, ios::out | ios::binary | ios::ate);
-						//size = data_need_to_writted.length();
-						//////in.seekg(0, ios::beg);
-						//buffer = new char[size];
-						///in.read(buffer, size);
+
 		out.write(html_code, html_size);
 		out.close();
-	     
-		
-  ///////////////////////////////////////////////////////////
-
 
 		delete[] html_code;
 		return 0;
@@ -186,33 +160,37 @@
 		bool Tool::client_2_handle_xhttp( const std::string& request_body, const std::string& content_type )
 		{
 			   // get boundary
-			std::string boundary = NULL;
+			std::string boundary = "";
 			auto temp = std::find(content_type.begin(),content_type.end(),'=');
 			if (temp==content_type.end()) {
 				return false;
 			}
-			boundary = std::string(temp, content_type.end() - 1);     //FIXME
+			boundary = std::string(temp, content_type.end());     //FIXME
 			DEBUG("boundary:%s", boundary.c_str());
 
 
 			  // 获取openID
-			std::string openID = NULL;
- 			temp = std::find(request_body.begin(),request_body.end(),"\r\n\r\n");
-			if (temp == request_body.end()) {
+			std::string openID = "";
+	        int position = request_body.find("\r\n\r\n");
+			
+			if (position == std::string::npos) {
 				return false;
 			}
-			openID = std::string(temp + 4, std::find(temp + 4, request_body.end(), "\r\n") - 1);
+
+
+			openID = std::string( HEAD_STRING(request_body,position), FOOT_STRING( request_body, request_body.find("\r\n", position + 4))    );
 			DEBUG("openID:%s", openID.c_str());
 
 
 			   // get picture binary
-			std::string picture_binary = NULL;
-			temp = std::find(temp+4, request_body.end(), "\r\n\r\n");
-			if (temp == request_body.end()) {
+			std::string picture_binary = "";
+		    position = request_body.find("\r\n\r\n", position+4 );
+			if (position == std::string::npos) {
 				return false;
 			}
+
 			/*    \r\n--${bound}--*/
-			picture_binary = std::string(temp + 4,  request_body.end() - content_type.length() - 7);
+			picture_binary = std::string( HEAD_STRING(request_body, position),  request_body.end() - content_type.length() - 7);
 			DEBUG("picture_binary:%s", picture_binary.c_str());
 
 
@@ -228,6 +206,10 @@
 
 			return true;
 		}
+
+
+
+
 
 	bool  Tool::client_3_handle_xhttp( const std::string& request_body, std::string*  wait_2_send_responseBody) {
 	

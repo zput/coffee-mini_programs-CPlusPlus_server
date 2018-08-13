@@ -1,9 +1,8 @@
 
-
+#pragma once
 #include<zxc_net/Logger.h>
 
 #include <string.h>
-#include <thread>
 #include <regex>
 #include <fstream>
 using namespace std;
@@ -18,6 +17,26 @@ using namespace std;
 #include "mysql_communicate.h"
 #pragma comment (lib,"ws2_32.lib")
 #endif
+
+#define HEAD_STRING(src,position)     (src).begin()+position+4     
+      
+
+#define FOOT_STRING(src,position)     (src).begin()+position    
+
+
+
+//#define HEAD_STRING(src,position) do {                    \
+//			                 (src).begin()+position+4     \
+//           					} while (0)
+//
+//#define FOOT_STRING(src,position) do {                    \
+//			                 (src).begin()+position-1     \
+//           					} while (0)
+
+
+
+
+
 
 
 bool   writerDataToFile(std::string filepath, std::string data_need_to_writted, int length);
@@ -61,7 +80,7 @@ class Tool {
 		mysql   mysql_;
 		string	boundary;
 			  //  static const 
-		const static string	picture_path_in_server_weixin; 
+		const static std::string	picture_path_in_server_weixin; 
 					
 };
 					

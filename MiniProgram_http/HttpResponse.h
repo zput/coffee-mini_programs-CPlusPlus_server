@@ -26,10 +26,13 @@ class HttpResponse:public zxc_net::copyable
     }
     void setStatusCode(HttpStatusCode code);
     void setStatusMessage(const string&message);
+
     void setCloseConnection(bool on);
     bool closeConnection()const;
+
     void setContentType(const string&contentType);
     void addHeader(const string&key,const string&value);
+
     void setBody(const string &body);
     void appendToBuffer(zxc_net::Buffer*output)const;
     private:

@@ -25,7 +25,7 @@ void onRequest(const HttpRequest& req, HttpResponse* resp)
 	std::string path = req.path();
 	auto it = std::find(path.begin()+1,path.end(),'/');  //FIXME
 
-	std::string is_client_or_backup(path.begin()+1,it-1);
+	std::string is_client_or_backup(path.begin() + 1, it);
 	int method_number = stoi( string(it+1,path.end()).c_str() );
 
 	DEBUG(" is_client_or_backup:%s---method_number:%d\n", is_client_or_backup.c_str(), method_number );
@@ -33,17 +33,18 @@ void onRequest(const HttpRequest& req, HttpResponse* resp)
 	if (is_client_or_backup == "client") {
 		std::string temp;
 		switch (method_number) {
-		case 1:  is_false = tool.client_1_handle_xhttp(req.getBody(), &temp);	 resp->setBody(temp);  break;
-		case 2:  is_false = tool.client_2_handle_xhttp(req.getBody(), (req.getHeader("Content-Type") != string(NULL)  )? req.getHeader("Content-Type"):req.getHeader("content-type")); break;
+			case 1:  is_false = tool.client_1_handle_xhttp(req.getBody(), &temp);	 resp->setBody(temp);  break;
+			case 2:  is_false = tool.client_2_handle_xhttp(req.getBody(), (req.getHeader("Content-Type") != string("")  )? req.getHeader("Content-Type"):req.getHeader("content-type")); break;
 		
-		case 3:  is_false = tool.client_3_handle_xhttp(req.getBody(), &temp);	 resp->setBody(temp);  break;
+			case 3:  is_false = tool.client_3_handle_xhttp(req.getBody(), &temp);	 resp->setBody(temp);  break;
 
-		case 4:  is_false = tool.client_4_handle_xhttp(req.getBody(), &temp);	 resp->setBody(temp);  break;
-		default: {		
-			ERROR("Request error \n");
-			is_false = false; }
-		}
-	} else if (is_client_or_backup == "backup") {
+			case 4:  is_false = tool.client_4_handle_xhttp(req.getBody(), &temp);	 resp->setBody(temp);  break;
+			default: {		
+				ERROR("Request error \n");
+				is_false = false; }
+		}  //end switch
+	} 
+	else if (is_client_or_backup == "backup") {
             // FIXME   
 	}
 	else {
@@ -51,7 +52,7 @@ void onRequest(const HttpRequest& req, HttpResponse* resp)
 		is_false = false;
 	}
 	 
-
+	resp->setCloseConnection(false);
     if(is_false == false)
     {
         resp->setStatusCode(HttpResponse::CODE_400);
@@ -81,7 +82,7 @@ int main(int argc, char* argv[])
     }
 
 	zxc_net::EventLoop loop;
-    HttpServer server(&loop, zxc_net::InetAddress(8000) );
+    HttpServer server(&loop, zxc_net::InetAddress(9020) );
     server.setHttpCallback(onRequest);
     server.setThreadNum(numThreads);
     server.start();

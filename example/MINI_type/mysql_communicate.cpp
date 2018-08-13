@@ -1,22 +1,8 @@
 
 #include <mysql_communicate.h>
 
-#include <iostream>
-#include <stdio.h>
-#include <string>
-#include <time.h>
 
 
-
-#if defined(_WIN32)
-	#include <windows.h>
-	#include "winsock.h" 
-	#include "include\mysql.h"
-	#pragma comment(lib,"libmySQL.lib") 
-	#pragma warning(disable:4996)
-#else
-
-#endif
 
 
 	    //init the mysql;
@@ -34,8 +20,10 @@
 
 				con->reconnect = 1;
 
-				query = "set names \'GBK\'";
-				//mysql_query(con,"set names \'GBK\'"); 
+				query = new char[16]();
+				memcpy(query,"set names \'GBK\'",15);
+				      //query = "set names \'GBK\'";
+				      //mysql_query(con,"set names \'GBK\'"); 
 
 				rt = mysql_real_query(con, query, strlen(query));
 				if (rt)
@@ -104,9 +92,9 @@
 									return false;
 								}
 									//std::string temp_mysql_order = "DELETE FROM test WHERE openid =\"" + strJsonData[0] + "\" ;";
-								char temp_64[64];
+								char temp_64[80];
 								sprintf(temp_64,"%I64d",time(0));
-								std::string temp_64_string = temp_64;
+								std::string temp_64_string(temp_64+strlen(temp_64)-20, temp_64+strlen(temp_64) );
 								std::string temp_mysql_order = "UPDATE "+return_tablename_mysql()+" SET openid =\""+ strJsonData[0]+ temp_64_string+"\"" +" WHERE openid =\"" + strJsonData[0] + "\" ;";
 
 								if (commonOrderMysql(temp_mysql_order)) {

@@ -106,7 +106,8 @@ void HttpServer::onRequest(const zxc_net::TcpConnectionPtr& conn, const HttpRequ
     if (response.closeConnection())
     {
 		ERROR("??shutdown FIXME \n");
-        conn->shutdown();
+        //conn->shutdown();
+		conn->forceClose();
     }
 #endif
 }

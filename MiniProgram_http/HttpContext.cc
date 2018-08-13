@@ -48,10 +48,14 @@ bool HttpContext::parseRequest(zxc_net::Buffer*buf)
                 }
                 else
                 {
-                // empty line, end of header
-                // FIXME:
-                    state_ = kGotAll;
-                    hasMore = false;
+					// empty line, end of header
+					// FIXME:
+					state_ = kExpectBody;
+
+#if 0
+					state_ = kGotAll;
+					hasMore = false;
+#endif
                 }
                 buf->retrieveUntil(crlf + 2);//回收
             }
@@ -62,7 +66,13 @@ bool HttpContext::parseRequest(zxc_net::Buffer*buf)
         }
         else if(state_==kExpectBody)
         {
-            // FIXME:
+			//FIXME 如何保证它的body 的数据全部读到了readBuff 里? , 如果还有数据在路上该怎么办 ? 
+			request_.setBody(buf->peek(), buf->peek() + buf->readableBytes());
+
+			buf->retrieveAll();
+			hasMore = false;
+			state_ = kGotAll;
+
         }
 
     }//endwhile

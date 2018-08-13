@@ -28,6 +28,7 @@ namespace Util
 			}
 				return string(path.begin()+i+1,path.end());
 			}
+
     //获取content-Type
 		void GetContentType(const string &tmpExtension,
 			string &contentType)
@@ -39,7 +40,7 @@ namespace Util
 				if(line[0]!='#')
 				{
 					stringstream lineStream(line);
-					contentType.clear();
+					contentType.clear();             // Notice
 					lineStream>>contentType;
 					vector<string>extensions;
 					string extension;
@@ -61,6 +62,9 @@ namespace Util
 			contentType="text/plain";
 			mimeFile.close();
 		}
+
+
+
     //获取Content
     string GetContent(const string &fileName)
     {

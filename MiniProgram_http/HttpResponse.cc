@@ -34,9 +34,10 @@ void HttpResponse::setBody(const string& body)
 void HttpResponse::appendToBuffer(zxc_net::Buffer* output) const
 {
     char buf[32];
+
     //构造响应行
     snprintf(buf, sizeof buf, "HTTP/1.1 %d ", statusCode_);
-    output->append(buf,sizeof(buf) );
+    output->append(buf,strlen(buf) );
     output->append(statusMessage_);
     output->append("\r\n",2);
 
@@ -50,7 +51,7 @@ void HttpResponse::appendToBuffer(zxc_net::Buffer* output) const
     {
         //Keep-Alive需要Content-Length
 		snprintf(buf, sizeof buf, "Content-Length: %zd\r\n", body_.size());
-		output->append(buf,sizeof(buf));
+		output->append(buf, strlen(buf) );
 
 		std::string temp = "Connection: Keep-Alive\r\n";
         output->append(temp);
@@ -58,8 +59,7 @@ void HttpResponse::appendToBuffer(zxc_net::Buffer* output) const
 
     for (std::map<string, string>::const_iterator it = headers_.begin();
         it != headers_.end();
-        ++it)
-     
+        ++it)   
     {
         //迭代构造响应头
         output->append(it->first);
@@ -69,7 +69,9 @@ void HttpResponse::appendToBuffer(zxc_net::Buffer* output) const
     }
 
     output->append("\r\n",2);
-    //响应报文
+
+
+    //响应报文body
     output->append(body_);
 
 }
