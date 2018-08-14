@@ -42,7 +42,7 @@ void onRequest(const HttpRequest& req, HttpResponse* resp)
 		std::string temp;
 		switch (method_number) {
 			case 1:  is_false = tool.client_1_handle_xhttp(req.getBody(), &temp);	 resp->setBody(temp);  break;
-			case 2:  is_false = tool.client_2_handle_xhttp(req.getBody(), (req.getHeader("Content-Type") != string("")  )? req.getHeader("Content-Type"):req.getHeader("content-type")); break;
+			case 2:  is_false = tool.client_2_handle_xhttp(req.getMultipartFormData("file"), req.getMultipartFormData("openid") ); break;
 		
 			case 3:  is_false = tool.client_3_handle_xhttp(req.getBody(), &temp);	 resp->setBody(temp);  break;
 

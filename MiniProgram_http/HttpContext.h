@@ -54,7 +54,10 @@ class HttpContext:public zxc_net::copyable
 				      return request_;
 			}
 
-    private:
+    private: 
+		std::string parserBoundary(std::string );
+		bool parserContentType_MultipartFormData(void);
+
 		//解析请求行
 			bool processRequestLine(const char* begin, const char* end);
 	

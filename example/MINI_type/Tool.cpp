@@ -158,62 +158,66 @@
 
 		bool Tool::client_2_handle_xhttp( const std::string& request_body, const std::string& content_type )
 		{
-			string filepath_temp = picture_path_in_server_weixin + "xx.tyy";
-			writerDataToFile(filepath_temp, request_body, request_body.length());
+
+
+				string filepath_temp = picture_path_in_server_weixin + "test_name.tyy";
+				writerDataToFile(filepath_temp, request_body, request_body.length());
+				DEBUG("openid:%s\n", content_type.c_str());
+
+				return true;
+
+
+		//	   // get boundary
+		//	std::string boundary = "";
+		//	auto temp = std::find(content_type.begin(),content_type.end(),'=');
+		//	if (temp==content_type.end()) {
+		//		return false;
+		//	}
+		//	boundary = std::string(temp+1, content_type.end());     //FIXME
+		//	DEBUG("boundary:|||%s|||\n", boundary.c_str());
+
+
+		//	  // 获取openID
+		//	std::string openID = "";
+	 //       int position = request_body.find("\r\n\r\n");
+		//	
+		//	if (position == std::string::npos) {
+		//		return false;
+		//	}
+
+
+		//	openID = std::string( HEAD_STRING(request_body,position), FOOT_STRING( request_body, request_body.find("\r\n", position + 4))    );
+		//	DEBUG("openID:|||%s|||\n", openID.c_str());
+
+
+		//	   // get picture binary
+		//	std::string picture_binary = "";
+		//    position = request_body.find("\r\n\r\n", position+4 );
+		//	if (position == std::string::npos) {
+		//		return false;
+		//	}
+
+		//	/*    \r\n--${bound}--*/
+		//	
+		//	picture_binary = std::string(HEAD_STRING(request_body, position), request_body.begin()+request_body.find(boundary, position + 4)-4 );
+
+		////	picture_binary = std::string( HEAD_STRING(request_body, position),  request_body.end() - boundary.length() - 8);
+		//	DEBUG("picture_binary:%s\n", picture_binary.c_str());
 
 
 
-			   // get boundary
-			std::string boundary = "";
-			auto temp = std::find(content_type.begin(),content_type.end(),'=');
-			if (temp==content_type.end()) {
-				return false;
-			}
-			boundary = std::string(temp+1, content_type.end());     //FIXME
-			DEBUG("boundary:|||%s|||\n", boundary.c_str());
+		//	     // 以openID 来得到数据库对应的 ID 号. 
+  //               // read the id related the openid 
+		//         // get data from  mysql;
+		//	std::string column_id = "id";				
+		//	if(mysql_.GetIdOrDataFromMysql(column_id, &openID) )
+		//			  DEBUG("Get the id:%s---success\n", openID.c_str() );
 
+  //  		string filepath = picture_path_in_server_weixin + openID + ".jpg";
+		//	DEBUG("filepath:%s\n", openID.c_str());
+		//	writerDataToFile(filepath, picture_binary, picture_binary.length());
 
-			  // 获取openID
-			std::string openID = "";
-	        int position = request_body.find("\r\n\r\n");
-			
-			if (position == std::string::npos) {
-				return false;
-			}
-
-
-			openID = std::string( HEAD_STRING(request_body,position), FOOT_STRING( request_body, request_body.find("\r\n", position + 4))    );
-			DEBUG("openID:|||%s|||\n", openID.c_str());
-
-
-			   // get picture binary
-			std::string picture_binary = "";
-		    position = request_body.find("\r\n\r\n", position+4 );
-			if (position == std::string::npos) {
-				return false;
-			}
-
-			/*    \r\n--${bound}--*/
-			
-			picture_binary = std::string(HEAD_STRING(request_body, position), request_body.begin()+request_body.find(boundary, position + 4)-4 );
-
-		//	picture_binary = std::string( HEAD_STRING(request_body, position),  request_body.end() - boundary.length() - 8);
-			DEBUG("picture_binary:%s\n", picture_binary.c_str());
-
-
-
-			     // 以openID 来得到数据库对应的 ID 号. 
-                 // read the id related the openid 
-		         // get data from  mysql;
-			std::string column_id = "id";				
-			if(mysql_.GetIdOrDataFromMysql(column_id, &openID) )
-					  DEBUG("Get the id:%s---success\n", openID.c_str() );
-
-    		string filepath = picture_path_in_server_weixin + openID + ".jpg";
-			DEBUG("filepath:%s\n", openID.c_str());
-			writerDataToFile(filepath, picture_binary, picture_binary.length());
-
-			return true;
+		//	return true;
 		}
 
 

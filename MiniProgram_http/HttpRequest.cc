@@ -162,6 +162,17 @@ string HttpRequest::getBody() const
 }
 
 
+void HttpRequest::addMultipartFormData(std::string& name, std::string& data) {
+	multipartFormData_[name] = data;
+}
 
-
-
+string HttpRequest::getMultipartFormData(const string& name) const
+{
+	string result = "";   // is error string result = NULL 
+	std::map<string, string>::const_iterator it = multipartFormData_.find(name);
+	if (it != multipartFormData_.end())
+	{
+		result = it->second;
+	}
+	return result;
+}

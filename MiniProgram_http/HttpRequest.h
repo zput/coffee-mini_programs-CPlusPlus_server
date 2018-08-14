@@ -58,12 +58,17 @@ class HttpRequest:zxc_net::copyable
 			void setBody(const char*start, const char*end);
 			string getBody()const;
 
+			void addMultipartFormData(std::string& name, std::string& data);
+			string getMultipartFormData(const string& name) const;
+
      private:					
 			// zxc_net::Timestamp receiveTime_;
 			
 			Method method_; /*spaceBlock*/  string path_; string query_;   /*spaceBlock*/   Version version_;
-			std::map<string, string>headers_;
+			std::map<string, string> headers_;
 			string body_;
+
+			std::map<string, string> multipartFormData_ ;   
 
 };
 #endif 

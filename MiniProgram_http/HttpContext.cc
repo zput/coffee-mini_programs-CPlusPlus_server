@@ -79,7 +79,13 @@ HttpContext::ParseReturn HttpContext::parseRequest(zxc_net::Buffer* original_buf
 			}
 
 			request_.setBody(buf->peek(), buf->peek() + temp);
-
+			  // parsing the body type is: multipart-form-data, it includes boundary;
+			if ( std::string::npos !=( (request_.getHeader("Content-Type") != std::string("")) ? request_.getHeader("Content-Type") : request_.getHeader("content-type") ).find("multipart/form-data") ) {
+				if (parserContentType_MultipartFormData() == false) {
+					ERROR("parsing Multipart-form-data ERROR\n");
+					return  ParseReturn::parseFailure;
+				}
+			}
 			buf->retrieve( temp );
 			hasMore = false;
 			state_ = kGotAll;
@@ -138,4 +144,82 @@ bool HttpContext::processRequestLine(const char*begin, const char*end)
 		}//endif
 	}//endif
 	return succeed;
+}
+
+
+std::string  HttpContext::parserBoundary(std::string content_type ) {
+	  // get boundary
+	std::string boundary = "";
+	auto temp = std::find(content_type.begin(), content_type.end(), '=');
+	if (temp == content_type.end()) {
+		return std::string("");
+	}
+	boundary = std::string(temp + 1, content_type.end());     //FIXME
+	DEBUG("boundary:%s\n", boundary.c_str());
+	return boundary;
+
+}
+
+
+
+bool HttpContext::parserContentType_MultipartFormData(void) {
+
+  std::string boundary = parserBoundary(  (request_.getHeader("Content-Type") != std::string("")) ? request_.getHeader("Content-Type") : request_.getHeader("content-type")   );
+  if (boundary == std::string()) {
+	  DEBUG("parsing boundary ERROR\n");
+	  return false;
+  }
+
+
+
+  //assert(request_.getBody()!=std::string(""))
+  const std::string temp = request_.getBody();
+
+  int name_head_position = 0;
+  int data_head = 0;
+  int data_tail = 0;
+  std::string name;
+  std::string data;
+  while (1) {
+	     // name
+	  name_head_position = temp.find("name=\"",data_tail);
+	  if (name_head_position == std::string::npos) {
+		  DEBUG("parsering multipartFormData\n");
+		  return  false;
+	  }
+	  name_head_position += 6;
+	  name = std::string(temp.begin() + name_head_position, temp.begin() + temp.find('\"', name_head_position));
+	  DEBUG("the name:%s\n",name.c_str());
+        // data
+	  data_head = temp.find("\r\n\r\n",name_head_position);
+	  if (data_head == std::string::npos) {
+		  DEBUG("parsering multipartFormData\n");
+		  return  false;
+	  }
+	  data_head += 4;
+	  data_tail = temp.find(boundary, data_head);
+	  if (data_tail == std::string::npos) {
+		  DEBUG("parsering multipartFormData\n");
+		  return  false;
+	  }
+	  data_tail -= 4;    //\r\n--${boundary}
+	  data = std::string(temp.begin() + data_head, temp.begin() + data_tail);
+	     //save to std::map
+	  request_.addMultipartFormData(name, data);
+
+
+
+	  if ( *(temp.begin()+data_tail+4+boundary.length() ) == '-'  ) {
+		   // is end;
+		  DEBUG("parsering the MultipartFormData is END\n");
+		  break;
+	  }
+	  else {
+		  DEBUG("\n-------THE NEXT----------\n");
+	  }
+
+  }
+  
+  return true;
+
 }
