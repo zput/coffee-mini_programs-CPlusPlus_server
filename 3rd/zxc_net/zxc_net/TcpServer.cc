@@ -53,6 +53,7 @@ TcpServer::~TcpServer () {
 	    conn->setWriteCallback(writeCallback_);
 		conn->setMessageCallback(messageCallback_);
 		conn->setConnectionCallback(connectionCallback_);
+
 		conn->setWriteCompleteCallback(writeCompleteCallback_);
 	    conn->setremoveConnectionCallback(bind(&TcpServer::removeConnection,this,std::placeholders::_1));
 

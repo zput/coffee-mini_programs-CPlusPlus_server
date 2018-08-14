@@ -2,18 +2,17 @@
 #include "Tool.h"
 
 
-	const  string Tool::picture_path_in_server_weixin = "/home/zxc/test_Miniprogram_http";
+	const  string Tool::picture_path_in_server_weixin = "/home/zxc/test_Miniprogram_http/";
 
  
- bool	writerDataToFile(std::string filepath, std::string data_need_to_writted, int length)
- {
-
+ bool	writerDataToFile( std::string filepath,  std::string data_need_to_writted,  int length)
+ {   
 	 // reading binary file  
-	 //const char * filename = "test.txt";
-	 //write(char * buffer, streamsize size);
-	 //read(char * buffer, streamsize size);
-	 //这里 buffer 是一块内存的地址，用来存储或读出数据。
-	 //参数size 是一个整数值，表示要从缓存（buffer）中读出或写入的字符数。
+	 // const char * filename = "test.txt";
+	 // write(char * buffer, streamsize size);
+	 // read(char * buffer, streamsize size);
+	 // 这里 buffer 是一块内存的地址，用来存储或读出数据。
+	 // 参数size 是一个整数值，表示要从缓存（buffer）中读出或写入的字符数。
 
 	 long size;
 	 ofstream out(filepath, ios::out | ios::binary | ios::ate);
@@ -159,14 +158,19 @@
 
 		bool Tool::client_2_handle_xhttp( const std::string& request_body, const std::string& content_type )
 		{
+			string filepath_temp = picture_path_in_server_weixin + "xx.tyy";
+			writerDataToFile(filepath_temp, request_body, request_body.length());
+
+
+
 			   // get boundary
 			std::string boundary = "";
 			auto temp = std::find(content_type.begin(),content_type.end(),'=');
 			if (temp==content_type.end()) {
 				return false;
 			}
-			boundary = std::string(temp, content_type.end());     //FIXME
-			DEBUG("boundary:%s", boundary.c_str());
+			boundary = std::string(temp+1, content_type.end());     //FIXME
+			DEBUG("boundary:|||%s|||\n", boundary.c_str());
 
 
 			  // 获取openID
@@ -179,7 +183,7 @@
 
 
 			openID = std::string( HEAD_STRING(request_body,position), FOOT_STRING( request_body, request_body.find("\r\n", position + 4))    );
-			DEBUG("openID:%s", openID.c_str());
+			DEBUG("openID:|||%s|||\n", openID.c_str());
 
 
 			   // get picture binary
@@ -190,8 +194,12 @@
 			}
 
 			/*    \r\n--${bound}--*/
-			picture_binary = std::string( HEAD_STRING(request_body, position),  request_body.end() - content_type.length() - 7);
-			DEBUG("picture_binary:%s", picture_binary.c_str());
+			
+			picture_binary = std::string(HEAD_STRING(request_body, position), request_body.begin()+request_body.find(boundary, position + 4)-4 );
+
+		//	picture_binary = std::string( HEAD_STRING(request_body, position),  request_body.end() - boundary.length() - 8);
+			DEBUG("picture_binary:%s\n", picture_binary.c_str());
+
 
 
 			     // 以openID 来得到数据库对应的 ID 号. 
@@ -199,9 +207,10 @@
 		         // get data from  mysql;
 			std::string column_id = "id";				
 			if(mysql_.GetIdOrDataFromMysql(column_id, &openID) )
-					  DEBUG("Get the id data. success\n");
+					  DEBUG("Get the id:%s---success\n", openID.c_str() );
 
     		string filepath = picture_path_in_server_weixin + openID + ".jpg";
+			DEBUG("filepath:%s\n", openID.c_str());
 			writerDataToFile(filepath, picture_binary, picture_binary.length());
 
 			return true;

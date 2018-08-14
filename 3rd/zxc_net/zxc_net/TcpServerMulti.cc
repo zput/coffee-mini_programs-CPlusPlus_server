@@ -64,6 +64,7 @@ void TcpServerMulti::start()
 
     baseServer_->setConnectionCallback(connectionCallback_);
     baseServer_->setMessageCallback(messageCallback_);
+
     baseServer_->setWriteCompleteCallback(writeCompleteCallback_);
     threadInitCallback_(0);
 	

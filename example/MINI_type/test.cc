@@ -25,6 +25,14 @@ void onRequest(const HttpRequest& req, HttpResponse* resp)
 	std::string path = req.path();
 	auto it = std::find(path.begin()+1,path.end(),'/');  //FIXME
 
+	if (it == path.end()) {
+		resp->setStatusCode(HttpResponse::CODE_400);
+		resp->setStatusMessage("Bad Request");
+		return;
+	}
+
+
+
 	std::string is_client_or_backup(path.begin() + 1, it);
 	int method_number = stoi( string(it+1,path.end()).c_str() );
 

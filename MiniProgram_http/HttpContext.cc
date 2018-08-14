@@ -1,8 +1,11 @@
 #include "HttpContext.h"
 
 //解析请求头
-bool HttpContext::parseRequest(zxc_net::Buffer*buf)
+HttpContext::ParseReturn HttpContext::parseRequest(zxc_net::Buffer* original_buf)
 {
+	zxc_net::Buffer buff(*original_buf);
+	zxc_net::Buffer* buf = &buff;
+	
     bool ok= true;
     bool hasMore=true;
     while(hasMore)
@@ -67,17 +70,25 @@ bool HttpContext::parseRequest(zxc_net::Buffer*buf)
         else if(state_==kExpectBody)
         {
 			//FIXME 如何保证它的body 的数据全部读到了readBuff 里? , 如果还有数据在路上该怎么办 ? 
-			request_.setBody(buf->peek(), buf->peek() + buf->readableBytes());
+			int temp =atoi(std::string(request_.getHeader("Content-Length") != std::string("") ? request_.getHeader("Content-Length") : request_.getHeader("content-length")).c_str() );
+			
+			if (buf->readableBytes() < temp) {
+				DEBUG("more datas need to receive ...Now:%d---Need:%d \n",buf->readableBytes(),temp);
+				//  Not needing to modify the original buff data;
+				return  ParseReturn::parseNeedMore;
+			}
 
-			buf->retrieveAll();
+			request_.setBody(buf->peek(), buf->peek() + temp);
+
+			buf->retrieve( temp );
 			hasMore = false;
 			state_ = kGotAll;
-
+			original_buf->swap(buff);
         }
 
     }//endwhile
 
-    return ok;
+    return ok? ParseReturn::parseSuccess :ParseReturn::parseFailure;
 }
 
 

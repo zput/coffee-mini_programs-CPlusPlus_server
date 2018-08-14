@@ -21,12 +21,19 @@ class HttpContext:public zxc_net::copyable
 				kGotAll,
 			};
 
+			enum ParseReturn
+			{
+				parseFailure=0,
+				parseSuccess=1,
+				parseNeedMore=2
+			};
+
 			HttpContext()
 				: state_(kExpectRequestLine)
 			{
 			}
 
-			bool parseRequest(zxc_net::Buffer* buf);
+			HttpContext::ParseReturn parseRequest(zxc_net::Buffer* buf);
 
 			bool gotAll() const
 			{ return state_ == kGotAll; }

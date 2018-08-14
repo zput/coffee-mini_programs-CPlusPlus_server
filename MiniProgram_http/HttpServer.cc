@@ -59,17 +59,23 @@ void HttpServer::onConnection(const zxc_net::TcpConnectionPtr& conn)
 void HttpServer::onMessage(const zxc_net::TcpConnectionPtr& conn,
 	zxc_net::Buffer& buf)
 {
-	DEBUG("Recover request : %s\n",buf.readAheadALLAsStringNotRetrieve().c_str() );
+	DEBUG("Recover request : %s\n", buf.readAheadALLAsStringNotRetrieve().c_str());
 
-    HttpContext*context=std::any_cast<HttpContext>(conn->getMutableContext());
+	HttpContext*context = std::any_cast<HttpContext>(conn->getMutableContext());
 
-        // 解析请求
-    if(!context->parseRequest(&buf) )
-    {
+	// 解析请求
+	HttpContext::ParseReturn r = context->parseRequest(&buf);
+	if (r== HttpContext::ParseReturn::parseFailure)
+	{
 		DEBUG("parseRequesting is failure \n");
-        conn->send("HTTP/1.1 400 Bad Request\r\n\r\n");
-        conn->shutdown();
-    }
+		conn->send("HTTP/1.1 400 Bad Request\r\n\r\n");
+		conn->shutdown();
+	}
+	else if (r == HttpContext::ParseReturn::parseNeedMore) {
+		INFO("more datas need to receive before parsing... \n");
+		return;
+	}
+
     if (context->gotAll())          //state_==gotALL
     {
         // 请求已经解析完毕
