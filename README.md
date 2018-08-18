@@ -34,4 +34,13 @@ std::string  HttpContext::parserBoundary(std::string content_type )
 
 ```
 
+## 安装
+需要gcc 7.x
+
+```sh
+$ ./build.sh 
+$ ./build.sh install
+
+```
+安装在 `../MiniProgram_http-build/Release/{include, lib, bin}`
 
